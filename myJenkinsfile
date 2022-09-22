@@ -4,10 +4,11 @@ node{
     stage('1cloneCode'){
         //use pipeline synthax to generate statement for cloning in a private repo
         //git credentialsId: 'GitHub-credentials', url: 'https://github.com/DerrickZeo/mymaven-web-app'
-        git "https://github.com/DerrickZeo/maven-web-application"
+        #git "https://github.com/DerrickZeo/maven-web-application"
         //git "https://github.com/DerrickZeo/mymaven-web-app"//private repository
         // sh "git clone https://github.com/DerrickZeo/maven-web-application" for shell cloning
         //bat "git clone https://github.com/DerrickZeo/maven-web-application" //for windows
+        git branch: 'stage', url: 'https://github.com/DerrickZeo/maven-web-application'//build from stage branch
     }
     stage('2Test&Build'){
         sh "${mavenhome}/bin/mvn install" //in jenkins server /var/lib/jenkins/tools we find the maven version installed from jenkins configuration
