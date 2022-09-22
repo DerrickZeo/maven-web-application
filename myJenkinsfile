@@ -1,0 +1,39 @@
+//we can install jenkins in Linux or windows OS
+node{
+    def mavenhome = tool name: 'maven'
+    stage('1cloneCode'){
+        //use pipeline synthax to generate statement for cloning in a private repo
+        //git credentialsId: 'GitHub-credentials', url: 'https://github.com/DerrickZeo/mymaven-web-app'
+        git "https://github.com/DerrickZeo/maven-web-application"
+        //git "https://github.com/DerrickZeo/mymaven-web-app"//private repository
+        // sh "git clone https://github.com/DerrickZeo/maven-web-application" for shell cloning
+        //bat "git clone https://github.com/DerrickZeo/maven-web-application" //for windows
+    }
+    stage('2Test&Build'){
+        sh "${mavenhome}/bin/mvn install" //in jenkins server /var/lib/jenkins/tools we find the maven version installed from jenkins configuration
+    }
+    stage('3Codequality'){
+        sh "${mavenhome}/bin/mvn sonar:sonar"
+    }
+    stage('4UploadArtifacts'){
+        sh "${mavenhome}/bin/mvn deploy"
+    }
+    stage('5Deploy_uat'){
+        //use pipeline synthax
+        deploy adapters: [tomcat9(credentialsId: 'new-credentials', path: '', url: 'http://172.31.35.2:8080/')], contextPath: null, war: 'target/*war'
+    }
+    //before deployment we go through an approval stage
+    stage('6Approval'){
+        timeout(time:9, unit: 'HOURS'){// appproval gate with an input message (unit can be HOURS,DAYS,MINUTES,...)
+            input message: 'Application ready for deployment, please review and approve'
+        }
+    }
+    stage('7daployProduction'){
+        //use pipeline synthax
+       deploy adapters: [tomcat9(credentialsId: 'new-credentials', path: '', url: 'http://172.31.35.2:8080/')], contextPath: null, war: 'target/*war'
+    }
+    stage('8Notification'){
+        //use pipeline synthax
+        emailext body: 'Dominion systems', recipientProviders: [developers()], subject: 'build status', to: 'derricktsamoh@gmail.com'
+    }
+}
