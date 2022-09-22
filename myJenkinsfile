@@ -20,7 +20,7 @@ node{
     }
     stage('5Deploy_uat'){
         //use pipeline synthax
-        deploy adapters: [tomcat9(credentialsId: 'new-credentials', path: '', url: 'http://172.31.35.2:8080/')], contextPath: null, war: 'target/*war'
+         deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://172.31.35.2:8080/')], contextPath: null, war: 'target/*war'
     }
     //before deployment we go through an approval stage
     stage('6Approval'){
